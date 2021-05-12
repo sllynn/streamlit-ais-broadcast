@@ -6,25 +6,25 @@ import pydeck as pdk
 import altair as alt
 from datetime import datetime
 
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, Window
 from pyspark.sql.functions import col, count, countDistinct, max as smax, log as slog
-from pyspark.sql import Window
 
 with open("config.yaml", "r") as fh:
     config = yaml.load(fh, Loader=yaml.CLoader)
 
 spark = SparkSession.builder.appName('streamlit-ais-broadcasts').getOrCreate()
 
-source_table = config["data"]["source_table"]
+source_table_name = config["data"]["source_table"]
+source_table = spark.table(source_table_name)
 
-if not spark.catalog.isCached(source_table):
-    spark.table(source_table).cache()
+if not spark.catalog.isCached(source_table_name):
+    source_table.cache()
 
 
 @st.cache
 def ts_counts(dummy=True) -> pd.DataFrame:
     count_by_day_df = (
-        spark.table(source_table)
+        source_table
         .groupBy("date")
         .agg(
             count("date").alias("broadcasts"),
@@ -40,7 +40,7 @@ def vessel_counts(ts_lb: datetime.date, ts_ub: datetime.date) -> pd.DataFrame:
     ws = Window().partitionBy().orderBy()
 
     vessel_count_sdf = (
-        spark.table(source_table)
+        source_table
         .where(col("date").between(ts_lb.isoformat(), ts_ub.isoformat()))
         .groupBy("h3")
         .agg(countDistinct("mmsi").alias("vessels"))
@@ -56,12 +56,12 @@ st.header("Automatic Identification System (AIS) data collected for all cargo ve
 st.markdown("See the NOAA Office for Coastal Management [page](https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2018/index.html) for more detail.")
 cols = st.beta_columns([2, 3])
 
-first_broadcast, last_broadcast = ts_counts()["date"].min(), ts_counts()["date"].max()
+ts_counts_pdf = ts_counts()
 
 broadcast_tsfilter_start, broadcast_tsfilter_end = (
     cols[0].slider(
         label="Select a time interval for analysis:",
-        value=(first_broadcast, last_broadcast),
+        value=(ts_counts_pdf["date"].min(), ts_counts_pdf["date"].max()),
         format="YYYY-MM-DD")
 )
 
@@ -85,7 +85,6 @@ cols[1].pydeck_chart(pdk.Deck(
     tooltip={"text": "Count: {vessels}"}
 ))
 
-ts_counts_pdf = ts_counts()
 ts_counts_filtered_pdf = ts_counts_pdf[
     (ts_counts_pdf["date"] >= broadcast_tsfilter_start) &
     (ts_counts_pdf["date"] <= broadcast_tsfilter_end)
