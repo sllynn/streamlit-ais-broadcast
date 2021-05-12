@@ -1,12 +1,12 @@
-# Streamlit-based interactive tool for exploring AIS broadcasts
+# Streamlit-based interactive tool for exploring AIS data
 This repository demonstrates querying a geospatial dataset stored in Databricks Delta (using the Databricks Connect component) and presenting the results in a Streamlit reactive dashboard.
 
 ![](./assets/screenshot.png)
 
 ### Getting started
 - Clone the repository.
-- Install the dependencies in `requirements.txt`.
-- Configure Databricks Connect to connect to a Databricks cluster running DBR 8.1.
+- Create a new conda environment or venv as preferred and install the dependencies in `requirements.txt`.
+- Configure [Databricks Connect](https://docs.databricks.com/dev-tools/databricks-connect.html) to connect to a Databricks cluster running DBR 8.1.
 - Update the `config-example.yaml` to include:
   - a [mapbox public API key](https://account.mapbox.com/auth/signup/); and 
   - the name of a Delta table, described below, registered in your workspace data catalogue;
