@@ -8,7 +8,7 @@ This repository demonstrates querying a geospatial dataset stored in Databricks 
 - Install the dependencies in `requirements.txt`.
 - Configure Databricks Connect to connect to a Databricks cluster running DBR 8.1.
 - Update the `config-example.yaml` to include:
-  - your mapbox public API key; and 
+  - a [mapbox public API key](https://account.mapbox.com/auth/signup/); and 
   - the name of a Delta table, described below, registered in your workspace data catalogue;
 
   and save the file locally as `config.yaml`.
