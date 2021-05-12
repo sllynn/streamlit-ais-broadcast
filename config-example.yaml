@@ -1,0 +1,4 @@
+data:
+  source_table: stuart.ais_broadcasts
+apikeys:
+  mapbox: my-mapbox-api-token

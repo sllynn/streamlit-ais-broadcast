@@ -1,0 +1,7 @@
+streamlit~=0.81.1
+PyYAML~=5.4.1
+pandas~=1.2.4
+pyarrow~=4.0.0
+pydeck~=0.6.2
+altair~=4.1.0
+databricks-connect==8.1.3
