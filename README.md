@@ -12,6 +12,8 @@ This repository demonstrates querying a geospatial dataset stored in Databricks 
   - the name of a Delta table, described below, registered in your workspace data catalogue;
 
   and save the file locally as `config.yaml`.
+- Run the Streamlit server with `streamlit run app.py` from the shell.
+- Follow the link to access the dashboard through your browser.
 
 ### Creating the Delta table to support this demo
 To create the dataset for this demo:
