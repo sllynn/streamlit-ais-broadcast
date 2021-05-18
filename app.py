@@ -74,7 +74,9 @@ class Dashboard:
             (time_series_data["date"] <= dataset.datetime_filter_ubound)
         ]
         self.plot_ts_charts(filtered_time_series_data)
-        self.plot_map_view(dataset.vessel_location_data)
+        with st.spinner("Querying vessel data..."):
+            self.plot_map_view(dataset.vessel_location_data)
+        st.success('Complete.')
 
     def add_slider(self, ts_lb, ts_ub):
         return (
