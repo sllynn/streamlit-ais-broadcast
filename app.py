@@ -55,6 +55,7 @@ class Dataset:
             ).toPandas()
         return vessel_counts(self.datetime_filter_lbound, self.datetime_filter_ubound)
 
+
 class Dashboard:
 
     def __init__(self, config):
@@ -62,8 +63,8 @@ class Dashboard:
         st.title("US coastal cargo traffic (2018)")
         st.header(
             "Automatic Identification System (AIS) data collected for all cargo vessels sailing around the US coastline")
-        st.markdown(
-            "See the NOAA Office for Coastal Management [page](https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2018/index.html) for more detail.")
+        info_url = "https://coast.noaa.gov/htdata/CMSP/AISDataHandler/2018/index.html"
+        st.markdown(f"See the NOAA Office for Coastal Management [page]({info_url}) for more detail.")
         self.cols = st.beta_columns([2, 3])
         dataset = Dataset(config)
         time_series_data = dataset.time_series_data
@@ -74,9 +75,11 @@ class Dashboard:
             (time_series_data["date"] <= dataset.datetime_filter_ubound)
         ]
         self.plot_ts_charts(filtered_time_series_data)
-        with st.spinner("Querying vessel data..."):
-            self.plot_map_view(dataset.vessel_location_data)
-        st.success('Complete.')
+        with st.spinner("Querying vessel locations..."):
+            map_data = dataset.vessel_location_data
+        with st.spinner("Rendering map..."):
+            self.plot_map_view(map_data)
+        st.success("Complete.")
 
     def add_slider(self, ts_lb, ts_ub):
         return (
@@ -90,20 +93,23 @@ class Dashboard:
     def plot_ts_charts(self, pdf: pd.DataFrame):
         ts_chart_base = (
             alt.Chart(pdf)
-                .encode(alt.X('date:T', axis=alt.Axis(title=None)))
+            .encode(alt.X('date:T', axis=alt.Axis(title=None)))
         )
         ts_chart_vessels = (
             ts_chart_base
-                .mark_line(stroke='#e37b12', interpolate='monotone', tooltip=True)
-                .encode(y=alt.Y("vessels:Q", axis=alt.Axis(titleColor="#e37b12")))
+            .mark_line(stroke='#e37b12', interpolate='monotone', tooltip=True)
+            .encode(y=alt.Y("vessels:Q", axis=alt.Axis(titleColor="#e37b12")))
         )
         ts_chart_broadcasts = (
             ts_chart_base
-                .mark_line(stroke='#7932a8', interpolate='monotone', tooltip=True)
-                .encode(y=alt.Y("broadcasts:Q", axis=alt.Axis(titleColor="#7932a8")))
+            .mark_line(stroke='#7932a8', interpolate='monotone', tooltip=True)
+            .encode(y=alt.Y("broadcasts:Q", axis=alt.Axis(titleColor="#7932a8")))
         )
 
-        self.cols[0].altair_chart(alt.layer(ts_chart_vessels, ts_chart_broadcasts).resolve_scale(y="independent"))
+        self.cols[0].altair_chart(
+            altair_chart=alt.layer(ts_chart_vessels, ts_chart_broadcasts).resolve_scale(y="independent"),
+            use_container_width=True
+        )
 
     def plot_map_view(self, pdf: pd.DataFrame):
         # Define a layer to display on a map
