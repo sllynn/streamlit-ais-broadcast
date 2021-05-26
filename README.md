@@ -17,6 +17,6 @@ This repository demonstrates querying a geospatial dataset stored in Databricks 
 
 ### Creating the Delta table to support this demo
 To create the dataset for this demo:
-- Create (or obtain access a) Databricks cluster running DBR 8.1.
+- Create (or obtain access to a) Databricks cluster running DBR 8.1.
 - Run through the first two notebooks in this [blog post](https://databricks.com/blog/2020/11/11/leveraging-esg-data-to-operationalize-sustainability.html) to download the 2018 AIS cargo vessel data, install the `H3` library and write the raw AIS dataset to Delta.
 - Run the code contained in the included notebook `compute-indexes.dbc` in `/assets/` to create a date partitioned dataset with H3 indexes.
